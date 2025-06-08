@@ -2,12 +2,13 @@ package com.relatos.ms_books_catalogue.controllers.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -25,24 +26,24 @@ public class CreateBookRequest {
     @NotBlank(message = "ISBN can not be empty")
     private String ISBN;
 
-    @NotBlank(message = "Published Date can not be empty")
-    private ZonedDateTime publishedDate;
+    @NotNull
+    private LocalDateTime publishedDate;
 
-    @NotBlank(message = "Stock Date can not be empty")
+    @NotNull
     private Integer stock;
 
-    @NotBlank(message = "Price Date can not be empty")
+    @NotNull
     private Double price;
 
     private Double rating;
 
     @Valid
-    private CreateAuthorRequest author;
+    private Long author;
 
     @NotBlank(message = "Image Date can not be empty")
     private String image;
 
     @Valid
-    private List<String> category;
+    private List<Long> category;
 
 }
