@@ -1,7 +1,7 @@
 server:
   port: 5227
   servlet:
-    context-path: '/api/v1/catalogue'
+    context-path: '/api/v1'
 spring:
   application:
     name: ms-books-catalogue
@@ -9,3 +9,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/cataloguedb
     username: catalogue
     password: R3l4t0SC4t4l0gu3
+  jpa:
+    hibernate:
+      ddl-auto: update
