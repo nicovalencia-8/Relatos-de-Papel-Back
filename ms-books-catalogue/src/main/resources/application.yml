@@ -1,0 +1,11 @@
+server:
+  port: 5227
+  servlet:
+    context-path: '/api/v1/catalogue'
+spring:
+  application:
+    name: ms-books-catalogue
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cataloguedb
+    username: catalogue
+    password: R3l4t0SC4t4l0gu3

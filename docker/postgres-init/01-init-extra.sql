@@ -1,0 +1,11 @@
+CREATE DATABASE paymentsdb;
+
+CREATE USER payments WITH PASSWORD 'R3l4t0SP4ym3ntS';
+
+GRANT ALL PRIVILEGES ON DATABASE paymentsdb TO payments;
+
+CREATE DATABASE cataloguedb;
+
+CREATE USER catalogue WITH PASSWORD 'R3l4t0SC4t4l0gu3';
+
+GRANT ALL PRIVILEGES ON DATABASE cataloguedb TO catalogue;

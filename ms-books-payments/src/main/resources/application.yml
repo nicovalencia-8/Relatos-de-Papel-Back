@@ -1,0 +1,11 @@
+server:
+  port: 5226
+  servlet:
+    context-path: '/api/v1/payments'
+spring:
+  application:
+    name: ms-books-payments
+  datasource:
+    url: jdbc:postgresql://localhost:5432/paymentsdb
+    username: payments
+    password: R3l4t0SP4ym3ntS
