@@ -18,4 +18,4 @@ eureka:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
   instance:
     preferIpAddres: true
-    hostname: ms-books-payments
+    hostname: ms-books-catalogue
