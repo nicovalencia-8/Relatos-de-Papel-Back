@@ -12,3 +12,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    preferIpAddres: true
+    hostname: ms-books-payments
