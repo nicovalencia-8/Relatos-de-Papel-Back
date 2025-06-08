@@ -1,14 +1,16 @@
 package com.relatos.ms_books_catalogue.controllers;
 
+import com.relatos.ms_books_catalogue.controllers.request.CreateBookRequest;
 import com.relatos.ms_books_catalogue.controllers.response.BookResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,8 +27,18 @@ public class CatalogueController {
             @ApiResponse(responseCode = "200", description = "Libro creado"),
             @ApiResponse(responseCode = "500", description = "Error al crear el libro")
     })
-    public BookResponse books(){
-        return new BookResponse();
+    public BookResponse books(@RequestBody @Valid CreateBookRequest createBookRequest) {
+        BookResponse bookResponse = new BookResponse();
+        bookResponse.setTitle(createBookRequest.getTitle());
+        bookResponse.setDescription(createBookRequest.getDescription());
+        bookResponse.setCategory(createBookRequest.getCategory());
+        bookResponse.setStock(createBookRequest.getStock());
+        bookResponse.setId(1L);
+        bookResponse.setAuthor(createBookRequest.getAuthor().getName() + " " + createBookRequest.getAuthor().getLastName());
+        bookResponse.setPrice(createBookRequest.getPrice());
+        bookResponse.setISBN(createBookRequest.getISBN());
+        bookResponse.setImg_url(createBookRequest.getImage());
+        return bookResponse;
     }
 
 }
