@@ -1,6 +1,7 @@
 package com.relatos.ms_books_catalogue.controllers;
 
 import com.relatos.ms_books_catalogue.controllers.request.CreateBookRequest;
+import com.relatos.ms_books_catalogue.controllers.request.UpdateBookRequest;
 import com.relatos.ms_books_catalogue.services.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -81,6 +82,20 @@ public class BooksController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el libro")
     })
     public ResponseEntity<?> books(@PathVariable Long bookId, @RequestBody @Valid CreateBookRequest bookRequest) {
+        try{
+            return ResponseEntity.ok(bookService.updateBookById(bookId, bookRequest));
+        } catch (IllegalArgumentException ex){
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{bookId}")
+    @Operation(summary = "Actualizar libro", description = "Actualiza el libro por ID en el catalogo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna el libro actualizado en la respuesta"),
+            @ApiResponse(responseCode = "500", description = "Error al actualizar el libro")
+    })
+    public ResponseEntity<?> books(@PathVariable Long bookId, @RequestBody UpdateBookRequest bookRequest) {
         try{
             return ResponseEntity.ok(bookService.updateBookById(bookId, bookRequest));
         } catch (IllegalArgumentException ex){

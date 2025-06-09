@@ -1,6 +1,7 @@
 package com.relatos.ms_books_catalogue.services;
 
 import com.relatos.ms_books_catalogue.controllers.request.CreateBookRequest;
+import com.relatos.ms_books_catalogue.controllers.request.UpdateBookRequest;
 import com.relatos.ms_books_catalogue.controllers.response.BookResponse;
 import com.relatos.ms_books_catalogue.controllers.response.commons.PageResponse;
 import com.relatos.ms_books_catalogue.domains.Author;
@@ -20,6 +21,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -96,6 +98,48 @@ public class BookService {
         book.setImage(image);
         book.setCategories(categories);
         book.setVisibility(bookRequest.getVisibility());
+        book = bookRepository.save(book);
+        return new BookResponse(book);
+    }
+
+    @Transactional
+    public BookResponse updateBookById(@Param("id") Long bookId, UpdateBookRequest bookRequest) {
+        Book book = bookRepository.findByIdC(bookId);
+        if (book == null){
+            throw new IllegalArgumentException("Libro no encontrado");
+        }
+        if(bookRequest.getAuthor() != null) {
+            Author author = validateAuthor(bookRequest.getAuthor());
+            book.setAuthor(author);
+        }
+        if(bookRequest.getCategory() != null) {
+            if (bookRequest.getCategory().isEmpty()){
+                book.setCategories(new ArrayList<>());
+            } else {
+                List<Category> categories = validateCategory(bookRequest.getCategory());
+                if(categories.size() != bookRequest.getCategory().size()){
+                    throw new IllegalArgumentException("Al menos una de las categorias no existe");
+                }
+                book.setCategories(categories);
+            }
+        }
+        if(bookRequest.getUrlImage() != null) {
+            Image image = imageRepository.findByIdC(book.getImage().getId());
+            if (image == null) {
+                throw new IllegalArgumentException("No se encontro la imagen a actualizar");
+            }
+            image.setUrlImage(bookRequest.getUrlImage());
+            image = imageRepository.save(image);
+            book.setImage(image);
+        }
+        if(bookRequest.getTitle() != null) book.setTitle(bookRequest.getTitle());
+        if(bookRequest.getDescription() != null) book.setDescription(bookRequest.getDescription());
+        if(bookRequest.getISBN() != null) book.setISBN(bookRequest.getISBN());
+        if(bookRequest.getPublishedDate() != null) book.setPublishedDate(bookRequest.getPublishedDate());
+        if(bookRequest.getStock() != null) book.setStock(bookRequest.getStock());
+        if(bookRequest.getPrice() != null) book.setPrice(bookRequest.getPrice());
+        if(bookRequest.getRating() != null) book.setRating(bookRequest.getRating());
+        if(bookRequest.getVisibility() != null) book.setVisibility(bookRequest.getVisibility());
         book = bookRepository.save(book);
         return new BookResponse(book);
     }
