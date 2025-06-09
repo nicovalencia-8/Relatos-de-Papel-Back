@@ -72,6 +72,7 @@ public class Book extends SoftEntity {
         this.author = author;
         this.image = image;
         this.categories = categories;
+        this.visibility = bookRequest.getVisibility();
     }
 
 }

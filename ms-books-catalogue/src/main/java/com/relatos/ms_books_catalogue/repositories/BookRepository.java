@@ -1,9 +1,9 @@
 package com.relatos.ms_books_catalogue.repositories;
 
 import com.relatos.ms_books_catalogue.domains.Book;
+import com.relatos.ms_books_catalogue.repositories.commons.SoftRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,13 +11,10 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Integer> {
+public interface BookRepository extends SoftRepository<Book> {
 
     @Query("SELECT b FROM Book b WHERE b.deleted = false AND LOWER(b.ISBN) = LOWER(:isbn)")
     Book findByISBN(@Param("isbn") String isbn);
-
-    @Query("SELECT b FROM Book b WHERE b.deleted = false AND b.id = :id")
-    Book findByIdC(@Param("id") Long id);
 
     @Query("SELECT b FROM Book b " +
             "WHERE b.deleted = false " +

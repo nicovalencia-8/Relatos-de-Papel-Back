@@ -46,4 +46,24 @@ public class AuthorService {
         return new PageResponse<>(pageAuthor.map(AuthorResponse::new));
     }
 
+    public Author updateAuthor(Long authorId, CreateAuthorRequest authorRequest) {
+        Author author = authorRepository.findByIdC(authorId);
+        if (author != null) {
+            author.setFirstName(authorRequest.getName());
+            author.setLastName(authorRequest.getLastName());
+            return authorRepository.save(author);
+        } else {
+            throw new IllegalArgumentException("El autor no se encuentra registrado");
+        }
+    }
+
+    public void deleteAuthor(Long authorId) {
+        Author author = authorRepository.findByIdC(authorId);
+        if (author != null){
+            authorRepository.softDelete(authorId);
+        } else {
+            throw new IllegalArgumentException("El autor no se encuentra registrado");
+        }
+    }
+
 }

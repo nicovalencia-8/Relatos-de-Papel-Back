@@ -41,9 +41,12 @@ public class CreateBookRequest {
     private Long author;
 
     @NotBlank(message = "Image Date can not be empty")
-    private String image;
+    private String urlImage;
 
     @Valid
     private List<Long> category;
+
+    @NotNull
+    private Boolean visibility;
 
 }
