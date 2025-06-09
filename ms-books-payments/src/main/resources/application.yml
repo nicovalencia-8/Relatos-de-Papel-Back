@@ -1,3 +1,4 @@
+##Consultar desde el gateway http://localhost:5224/ms-books-payments/api/v1/payments
 server:
   port: 5226
   servlet:
@@ -9,3 +10,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/paymentsdb
     username: payments
     password: R3l4t0SP4ym3ntS
+## Configuración CLiente Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:5225/eureka}
+  instance:
+    preferIpAddress: true
+    hostname: ms-books-payments

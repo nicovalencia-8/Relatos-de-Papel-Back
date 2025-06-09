@@ -21,6 +21,8 @@
     <modules>
         <module>ms-books-catalogue</module>
         <module>ms-books-payments</module>
+        <module>ms-eureka</module>
+        <module>ms-gateway</module>
     </modules>
 
     <properties>
