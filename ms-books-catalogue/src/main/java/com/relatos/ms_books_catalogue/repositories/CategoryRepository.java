@@ -17,4 +17,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("SELECT c FROM Category c WHERE c.id IN :ids AND c.deleted = false")
     List<Category> findAllByIds(@Param("ids") List<Long> ids);
 
+    @Query("SELECT c FROM Category c WHERE c.deleted = false AND c.id = :id")
+    Category findByIdC(@Param("id") Long id);
 }

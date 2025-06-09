@@ -1,10 +1,14 @@
 package com.relatos.ms_books_catalogue.services;
 
 import com.relatos.ms_books_catalogue.controllers.request.CreateCategoryRequest;
+import com.relatos.ms_books_catalogue.controllers.response.CategoryResponse;
+import com.relatos.ms_books_catalogue.controllers.response.commons.PageResponse;
 import com.relatos.ms_books_catalogue.domains.Category;
 import com.relatos.ms_books_catalogue.repositories.CategoryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +26,16 @@ public class CategoryService {
         } else {
             throw new IllegalArgumentException("La categoria ya existe");
         }
+    }
+
+    public Category getCategory(Long id) {
+        return categoryRepository.findByIdC(id);
+    }
+
+    public PageResponse<CategoryResponse> getAllCategories(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Category> categoryPage = categoryRepository.findAll(pageRequest);
+        return new PageResponse<>(categoryPage.map(CategoryResponse::new));
     }
 
 }

@@ -30,7 +30,7 @@ public class CatalogueController {
     private final BookService bookService;
 
     @PostMapping("/books")
-    @Operation(summary = "Crear libros", description = "Crea un libro en el catalogo y retorna el libro creado como repsuesta")
+    @Operation(summary = "Crear libros", description = "Crea un libro en el catalogo y retorna el libro creado como respuesta")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Libro creado"),
             @ApiResponse(responseCode = "500", description = "Error al crear el libro")
@@ -80,7 +80,7 @@ public class CatalogueController {
     }
 
     @PostMapping("/categories")
-    @Operation(summary = "Crear categorias", description = "Crea una categoria en el catalogo y retorna la categoria creada como repsuesta")
+    @Operation(summary = "Crear categorias", description = "Crea una categoria en el catalogo y retorna la categoria creada como respuesta")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria creada"),
             @ApiResponse(responseCode = "500", description = "Error al crear la categoria")
@@ -93,8 +93,37 @@ public class CatalogueController {
         }
     }
 
+    @GetMapping("/categories/{categoryId}")
+    @Operation(summary = "Consultar categoria", description = "Consulta las categoria por ID en el catalogo ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resultado de la categoria"),
+            @ApiResponse(responseCode = "500", description = "Error al encontrar la categoria")
+    })
+    public ResponseEntity<?> categories(@PathVariable Long categoryId) {
+        try{
+            return ResponseEntity.ok(categoryService.getCategory(categoryId));
+        } catch (IllegalArgumentException ex){
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/categories")
+    @Operation(summary = "Consultar categorias", description = "Consulta las categorias en el catalogo ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resultado de las categorias"),
+            @ApiResponse(responseCode = "500", description = "Error al encontrar las categorias")
+    })
+    public ResponseEntity<?> categories(@RequestParam int page,
+                                   @RequestParam int size) {
+        try{
+            return ResponseEntity.ok(categoryService.getAllCategories(page, size));
+        } catch (IllegalArgumentException ex){
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @PostMapping("/authors")
-    @Operation(summary = "Crear autores", description = "Crea un autor en el catalogo y retorna el autor creada como repsuesta")
+    @Operation(summary = "Crear autores", description = "Crea un autor en el catalogo y retorna el autor creada como respuesta")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Autor creado"),
             @ApiResponse(responseCode = "500", description = "Error al crear el autor")
