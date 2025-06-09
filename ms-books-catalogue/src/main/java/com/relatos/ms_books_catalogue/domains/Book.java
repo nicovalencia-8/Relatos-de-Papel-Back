@@ -59,6 +59,8 @@ public class Book extends SoftEntity {
     )
     private List<Category> categories = new ArrayList<>();
 
+    private Boolean visibility;
+
     public Book(CreateBookRequest bookRequest, Image image, Author author, List<Category> categories) {
         this.title = bookRequest.getTitle();
         this.description = bookRequest.getDescription();
