@@ -89,11 +89,11 @@ Este repositorio contiene la implementación del back-end de la aplicación **Re
 
 ## 📌 Tecnologías
 
-- Java 17
-- Spring Boot 2.7.x
+- Java 21
+- Spring Boot 3.5.0
 - Spring Cloud 2021.x
 - Spring Data JPA
-- H2 / MySQL
+- PostgreSQL.
 - Eureka Discovery Server
 - Spring Cloud Gateway
 - Maven
@@ -113,5 +113,5 @@ Este repositorio contiene la implementación del back-end de la aplicación **Re
 
 Grupo  Ramen X:
 - Sergio Vela
-- Nicolás
+- Nicolás Valencia
 - Marly Johana Yepes
