@@ -59,13 +59,14 @@ Este repositorio contiene la implementación del back-end de la aplicación **Re
 
 **Context path:** `/api/v1/payments`
 
-| Método HTTP | URI | Operación asociada | Respuesta |
-|-------------|-----|---------------------|-----------|
-| `POST` | `/api/v1/payments/pedidos` | 1. Crear nuevo pedido | `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict`, `500 Internal Server Error` |
-| `GET` | `/api/v1/payments/pedidos` | 2. Listar todos los pedidos | `200 OK`, `400 Bad Request`, `404 Not Found`, `500 Internal Server Error` |
-| `GET` | `/api/v1/payments/pedidos/{idPedido}` | 3. Ver detalle de un pedido | `200 OK`, `400 Bad Request`, `404 Not Found`, `500 Internal Server Error` |
-| `GET` | `/api/v1/payments/pedidos/usuario/{idUsuario}` | 4. Ver pedidos por usuario | `200 OK`, `400 Bad Request`, `404 Not Found`, `500 Internal Server Error` |
-| `DELETE` | `/api/v1/payments/pedidos/{idPedido}` | 5. Eliminar pedido (opcional) | `204 No Content`, `400 Bad Request`, `404 Not Found`, `500 Internal Server Error` |
+| Método   | Endpoint                                         | Operación asociada                                   | Estado involucrado      | Validaciones necesarias                                                                 | Códigos de respuesta                                             | JSON de entrada                                                                 |
+|----------|--------------------------------------------------|------------------------------------------------------|--------------------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| `POST`   | `/api/payments/orders`                          | 1.Crear una nueva orden/carrito con uno o más libros | `PENDING`                | Validar cada libro contra catálogo: existencia, stock, visibilidad                      | `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict` | ```json { "userId": "joha123", "items": [ { "itemId": "libro1", "quantity": 2 }, { "itemId": "libro2", "quantity": 1 } ] } ``` |
+| `PATCH`  | `/api/payments/orders/{orderId}/add-item`       | 2.Añadir un nuevo ítem a una orden/carrito existente | `PENDING`                | Validar ítem, verificar que la orden esté en estado `PENDING`                           | `200 OK`, `400 Bad Request`, `404 Not Found`, `409 Conflict`     | ```json { "itemId": "libro3", "quantity": 1 } ```                              |
+| `PATCH`  | `/api/payments/orders/{orderId}/pay`            | 3.Pagar la orden                                     | `PENDING → PAID`         | Revalidar visibilidad y stock. Descontar stock en catálogo                              | `200 OK`, `400 Bad Request`, `404 Not Found`, `409 Conflict`     | —                                                                                |
+| `GET`    | `/api/payments/orders/user/{userId}`            | 4.Consultar todas las órdenes de un usuario          | —                        | Validar existencia de usuario (si se requiere)                                           | `200 OK`, `404 Not Found`                                        | —                                                                                |
+| `GET`    | `/api/payments/orders/{orderId}`                | 5.Consultar detalle de una orden específica          | —                        | Validar que exista, y que pertenezca al usuario (opcional)                              | `200 OK`, `404 Not Found`                                        | —                                                                                |
+| `DELETE` | `/api/payments/orders/{orderId}`                | 6.Eliminar una orden/carrito no pagado               | `PENDING`                | Solo permitir si no está pagada (`PENDING`)                                              | `204 No Content`, `404 Not Found`, `409 Conflict`               | —                                                                                |
 
 ---
 

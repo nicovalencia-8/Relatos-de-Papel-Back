@@ -1,6 +1,6 @@
 ##Consultar desde el gateway http://localhost:5224/ms-books-catalogue/api/v1/catalogue
 server:
-  port: ${PORT:5227}
+  port: ${PORT:5222}
   servlet:
     context-path: '/api/v1/catalogue'
 spring:

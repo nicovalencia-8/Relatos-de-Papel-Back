@@ -2,19 +2,16 @@ package com.relatos.ms_books_payments.controllers.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CreatePaymentRequest {
-
+public class AddItemRequest {
     @NotBlank
-    private String userId;
+    private String bookId;
 
-    @NotBlank
-    private String itemId;
-
-    @NotNull
-    @Min(1)
+    @Min(value = 1)
+    private String bookTitle;
     private Integer quantity;
+    private Double price;
 }
+
