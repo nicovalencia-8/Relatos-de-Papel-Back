@@ -47,14 +47,10 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
+
+
     private PaymentResponse toResponse(Payment payment) {
         return new PaymentResponse(
-                payment.getId(),
-                payment.getUserId(),
-                payment.getItemId(),
-                payment.getQuantity(),
-                payment.getTotalAmount(),
-                payment.getCreatedAt()
         );
     }
 }
