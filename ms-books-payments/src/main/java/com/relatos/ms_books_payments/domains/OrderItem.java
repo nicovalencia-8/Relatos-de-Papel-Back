@@ -1,27 +1,26 @@
 package com.relatos.ms_books_payments.domains;
 
+import com.relatos.ms_books_payments.controllers.request.OrderItemRequest;
+import com.relatos.ms_books_payments.domains.commons.SoftEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name="order_item")
 @Builder
-public class OrderItem {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class OrderItem extends SoftEntity {
 
     private Long bookId;
     private Integer quantity;
     private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
+    public OrderItem(OrderItemRequest orderItemRequest) {
+        this.bookId = orderItemRequest.getBookId();
+        this.quantity = orderItemRequest.getQuantity();
+        this.price = orderItemRequest.getPrice();
+    }
 }

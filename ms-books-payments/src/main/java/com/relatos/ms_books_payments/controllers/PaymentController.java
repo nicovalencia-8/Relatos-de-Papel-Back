@@ -38,8 +38,7 @@ public class PaymentController {
     })
     public ResponseEntity<?> createOrder(@Valid @RequestBody CreateOrderRequest request) {
         try {
-            OrderResponse response = paymentService.createOrder(request);
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(201).body(paymentService.createOrder(request));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }

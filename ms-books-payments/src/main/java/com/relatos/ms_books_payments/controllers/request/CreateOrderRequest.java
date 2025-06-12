@@ -1,6 +1,5 @@
 package com.relatos.ms_books_payments.controllers.request;
 
-import com.relatos.ms_books_payments.domains.OrderItem;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,5 +16,5 @@ public class CreateOrderRequest {
     @NotNull
     private Long userId;
     @NotNull
-    private List<OrderItem> items;
+    private List<OrderItemRequest> items;
 }

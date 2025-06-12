@@ -10,6 +10,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/paymentsdb
     username: payments
     password: R3l4t0SP4ym3ntS
+  jpa:
+    hibernate:
+      ddl-auto: update
 ## Configuración CLiente Eureka
 eureka:
   client:

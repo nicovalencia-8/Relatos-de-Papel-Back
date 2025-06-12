@@ -30,16 +30,11 @@ public class Order extends SoftEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderItem> items = new ArrayList<>();
 
-    // Agrega un item a la orden y setea la relación bidireccional
-    public void addItem(OrderItem orderItem) {
-        orderItem.setOrder(this);
-        this.items.add(orderItem);
-    }
 
-    public Order(CreateOrderRequest createOrderRequest) {
-        this.userId = createOrderRequest.getUserId();
-        this.status = new OrderStatus(OrderStatusEnum.PENDING.name());
+    public Order(Long userId, OrderStatus status, List<OrderItem> items) {
+        this.userId = userId;
+        this.status = status;
         this.paidAt = LocalDateTime.now();
-        this.items = createOrderRequest.getItems();
+        this.items = items;
     }
 }

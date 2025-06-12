@@ -25,7 +25,9 @@ public class PaymentService {
     // 1. Crear nueva orden
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest orderRequest) {
-        Order order = new Order(orderRequest);
+        List<OrderItem> listItems = orderRequest.getItems().stream().map(OrderItem::new).toList();
+
+        Order order = new Order(orderRequest.getUserId(), new OrderStatus(OrderStatusEnum.PENDING.name()), listItems);
         Order saved = orderRepository.save(order);
         return new OrderResponse(saved);
     }
@@ -53,7 +55,7 @@ public class PaymentService {
                 .price(request.getPrice())
                 .build();
 
-        order.addItem(orderItem);
+        //order.addItem(orderItem);
         Order updated = orderRepository.save(order);
 
         return new OrderResponse(updated);
