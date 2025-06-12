@@ -75,7 +75,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "Órdenes encontradas"),
             @ApiResponse(responseCode = "204", description = "Sin órdenes registradas")
     })
-    public ResponseEntity<?> getOrdersByUser(@PathVariable String userId) {
+    public ResponseEntity<?> getOrdersByUser(@PathVariable Long userId) {
         List<OrderResponse> responses = paymentService.getOrdersByUser(userId);
         return responses.isEmpty() ?
                 ResponseEntity.noContent().build() :

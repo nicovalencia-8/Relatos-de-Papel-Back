@@ -1,6 +1,6 @@
 ##Consultar desde el gateway http://localhost:5224/ms-books-payments/api/v1/payments
 server:
-  port: 5226
+  port: 5215
   servlet:
     context-path: '/api/v1/payments'
 spring:
@@ -14,7 +14,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:http://localhost:5225/eureka}
+      defaultZone: ${EUREKA_URL:http://localhost:5223/eureka}
   instance:
     preferIpAddress: true
     hostname: ms-books-payments

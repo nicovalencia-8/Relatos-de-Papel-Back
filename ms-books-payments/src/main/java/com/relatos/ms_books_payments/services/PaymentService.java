@@ -88,7 +88,7 @@ public class PaymentService {
     }
 
     // 4. Consultar órdenes por usuario
-    public List<OrderResponse> getOrdersByUser(String userId) {
+    public List<OrderResponse> getOrdersByUser(Long userId) {
         return orderRepository.findByUserId(userId).stream()
                 .map(OrderResponse::from)
                 .collect(Collectors.toList());
