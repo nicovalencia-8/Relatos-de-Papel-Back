@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class MsBooksCatalogueApplication {
 
 	public static void main(String[] args) {
-		System.setProperty("spring.application.name", "ms-books-catalogue");
 		SpringApplication.run(MsBooksCatalogueApplication.class, args);
 	}
 
