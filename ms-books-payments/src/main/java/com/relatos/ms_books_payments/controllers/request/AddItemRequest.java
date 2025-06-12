@@ -7,10 +7,9 @@ import lombok.Data;
 @Data
 public class AddItemRequest {
     @NotBlank
-    private String bookId;
+    private Long bookId;
 
     @Min(value = 1)
-    private String bookTitle;
     private Integer quantity;
     private Double price;
 }

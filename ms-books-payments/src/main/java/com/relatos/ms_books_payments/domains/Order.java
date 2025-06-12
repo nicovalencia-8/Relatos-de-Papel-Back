@@ -1,5 +1,7 @@
 package com.relatos.ms_books_payments.domains;
 
+import com.relatos.ms_books_payments.controllers.request.CreateOrderRequest;
+import com.relatos.ms_books_payments.domains.commons.SoftEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,19 +16,13 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "order")
 @Builder
-public class Order {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Order extends SoftEntity {
 
     private Long userId;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "status_id")
     private OrderStatus status;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
@@ -34,24 +30,16 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderItem> items = new ArrayList<>();
 
-    // Se ejecuta automáticamente antes de insertar
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Métodos útiles de estado
-    public boolean isPending() {
-        return OrderStatus.PENDING.equals(this.status);
-    }
-
-    public boolean isPaid() {
-        return OrderStatus.PAID.equals(this.status);
-    }
-
     // Agrega un item a la orden y setea la relación bidireccional
     public void addItem(OrderItem orderItem) {
         orderItem.setOrder(this);
         this.items.add(orderItem);
+    }
+
+    public Order(CreateOrderRequest createOrderRequest) {
+        this.userId = createOrderRequest.getUserId();
+        this.status = new OrderStatus(OrderStatusEnum.PENDING.name());
+        this.paidAt = LocalDateTime.now();
+        this.items = createOrderRequest.getItems();
     }
 }

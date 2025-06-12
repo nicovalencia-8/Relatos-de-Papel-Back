@@ -3,6 +3,7 @@ import com.relatos.ms_books_payments.controllers.response.OrderItemResponse;
 import com.relatos.ms_books_payments.domains.Order;
 
 
+import com.relatos.ms_books_payments.domains.OrderStatus;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,17 +14,13 @@ import java.util.stream.Collectors;
 public class OrderResponse {
     private Long id;
     private Long userId;
-    private String status;
+    private OrderStatus status;
     private List<OrderItemResponse> items;
 
-    public static @NotNull OrderResponse from(Order order) {
-        OrderResponse response = new OrderResponse();
-        response.setId(order.getId());
-        response.setUserId(order.getUserId());
-        response.setStatus(order.getStatus().name()); // Enum -> String
-        response.setItems(order.getItems().stream()
-                .map(OrderItemResponse::from)
-                .collect(Collectors.toList()));
-        return response;
+    public OrderResponse (Order order) {
+       this.id = order.getId();
+       this.userId = order.getUserId();
+       this.status = order.getStatus();
+       this.items = order.getItems().stream().map(OrderItemResponse::new).collect(Collectors.toList());
     }
 }

@@ -18,7 +18,6 @@ public class OrderItem {
     private Long id;
 
     private Long bookId;
-    private String bookTitle;
     private Integer quantity;
     private Double price;
 

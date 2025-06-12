@@ -6,6 +6,7 @@ import com.relatos.ms_books_payments.controllers.response.OrderResponse;
 import com.relatos.ms_books_payments.domains.Order;
 import com.relatos.ms_books_payments.domains.OrderItem;
 import com.relatos.ms_books_payments.domains.OrderStatus;
+import com.relatos.ms_books_payments.domains.OrderStatusEnum;
 import com.relatos.ms_books_payments.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,33 +24,19 @@ public class PaymentService {
 
     // 1. Crear nueva orden
     @Transactional
-    public OrderResponse createOrder(CreateOrderRequest request) {
-        Order order = Order.builder()
-                .userId(Long.parseLong(String.valueOf(request.getUserId())))
-                .status(OrderStatus.PENDING)
-                .build();
-
-        request.getItems().forEach(item -> {
-            OrderItem orderItem = OrderItem.builder()
-                    .bookId(item.getBookId())
-                    .id(Long.valueOf(item.getBookTitle()))
-                    .quantity(item.getQuantity())
-                    .price(item.getPrice())
-                    .build();
-            order.addItem(orderItem);
-        });
-
+    public OrderResponse createOrder(CreateOrderRequest orderRequest) {
+        Order order = new Order(orderRequest);
         Order saved = orderRepository.save(order);
-        return OrderResponse.from(saved);
+        return new OrderResponse(saved);
     }
 
-    // 2. Añadir ítem a orden existente
+    // 2. Añadir ítem a orden existente //Para revisar
     @Transactional
     public OrderResponse addItemToOrder(Long orderId, AddItemRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Orden no encontrada"));
 
-        if (!order.isPending()) {
+        if (!order.getStatus().getName().equals(OrderStatusEnum.PENDING.name())) {
             throw new IllegalStateException("No se puede añadir a una orden ya pagada");
         }
 
@@ -61,8 +48,7 @@ public class PaymentService {
         }
 
         OrderItem orderItem = OrderItem.builder()
-                .bookId(Long.valueOf(Long.parseLong(request.getBookId())))
-                .bookTitle(request.getBookTitle())
+                .bookId(request.getBookId())
                 .quantity(request.getQuantity())
                 .price(request.getPrice())
                 .build();
@@ -70,7 +56,7 @@ public class PaymentService {
         order.addItem(orderItem);
         Order updated = orderRepository.save(order);
 
-        return OrderResponse.from(updated);
+        return new OrderResponse(updated);
     }
 
     // 3. Pagar orden
@@ -79,25 +65,25 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Orden no encontrada"));
 
-        if (order.isPaid()) {
+        if (order.getStatus().getName().equals(OrderStatusEnum.PAID.name())) {
             throw new IllegalStateException("La orden ya está pagada");
         }
 
-        order.setStatus(OrderStatus.PAID);
-        return OrderResponse.from(orderRepository.save(order));
+        order.setStatus(new OrderStatus(OrderStatusEnum.PAID.name()));
+        return new OrderResponse(orderRepository.save(order));
     }
 
     // 4. Consultar órdenes por usuario
     public List<OrderResponse> getOrdersByUser(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-                .map(OrderResponse::from)
+                .map(OrderResponse::new)
                 .collect(Collectors.toList());
     }
 
     // 5. Consultar detalle de orden
     public Optional<OrderResponse> getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
-                .map(OrderResponse::from);
+                .map(OrderResponse::new);
     }
 
     // 6. Eliminar orden pendiente
@@ -106,7 +92,7 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Orden no encontrada"));
 
-        if (order.isPaid()) {
+        if (order.getStatus().getName().equals(OrderStatusEnum.PAID.name())) {
             throw new IllegalStateException("No se puede eliminar una orden pagada");
         }
 

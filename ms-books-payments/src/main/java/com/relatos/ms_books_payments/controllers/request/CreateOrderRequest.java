@@ -1,19 +1,21 @@
 package com.relatos.ms_books_payments.controllers.request;
 
-import lombok.Data;
+import com.relatos.ms_books_payments.domains.OrderItem;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CreateOrderRequest {
+    @NotNull
     private Long userId;
-    private List<OrderItemDto> items;
-
-    @Data
-    public static class OrderItemDto {
-        private Long bookId;
-        private String bookTitle;
-        private Integer quantity;
-        private Double price;
-    }
+    @NotNull
+    private List<OrderItem> items;
 }
