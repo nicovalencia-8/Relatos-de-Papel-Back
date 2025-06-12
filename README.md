@@ -113,6 +113,6 @@ Este repositorio contiene la implementación del back-end de la aplicación **Re
 ## 🧠 Autores
 
 Grupo  Ramen X:
-- Sergio Vela
+- Sergio Muñoz Vela
 - Nicolás Valencia
 - Marly Johana Yepes
