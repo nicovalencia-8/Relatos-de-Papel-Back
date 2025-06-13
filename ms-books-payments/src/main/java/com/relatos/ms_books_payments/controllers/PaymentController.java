@@ -23,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Pagos", description = "Controlador para administrar los pedidos y pagos")
-
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -32,12 +31,13 @@ public class PaymentController {
     @Operation(summary = "Crear orden", description = "Crea un nuevo pedido (carrito) con uno o más libros")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Orden creada exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
             @ApiResponse(responseCode = "404", description = "Libro no encontrado o sin stock")
     })
     public ResponseEntity<GeneralResponse<OrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest request) {
         try {
-            return ResponseEntity.status(201).body(paymentService.createOrder(request));
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(paymentService.createOrder(request));
         } catch (IllegalArgumentException ex) {
             GeneralResponse<OrderResponse> response = new GeneralResponse<>(
                     HttpStatus.BAD_REQUEST.value(),
@@ -55,8 +55,7 @@ public class PaymentController {
     @Operation(summary = "Añadir ítem a orden", description = "Añade un nuevo libro a una orden existente")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ítem añadido exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Orden o libro no encontrado"),
-            @ApiResponse(responseCode = "409", description = "Conflicto de estado o ítem duplicado")
+            @ApiResponse(responseCode = "404", description = "Orden o libro no encontrado")
     })
     public ResponseEntity<GeneralResponse<OrderResponse>> addItemToOrder(
             @PathVariable Long orderId,
@@ -80,8 +79,7 @@ public class PaymentController {
     @Operation(summary = "Pagar orden", description = "Finaliza y paga una orden si todo está en orden")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Orden pagada exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Orden o libro no encontrado"),
-            @ApiResponse(responseCode = "409", description = "Orden ya pagada o sin stock")
+            @ApiResponse(responseCode = "404", description = "Orden o libro no encontrado")
     })
     public ResponseEntity<GeneralResponse<OrderResponse>> payOrder(@PathVariable Long orderId) {
         try{
@@ -110,13 +108,13 @@ public class PaymentController {
             return ResponseEntity.ok(paymentService.getOrdersByUser(userId));
         } catch (IllegalArgumentException ex){
             GeneralResponse<List<OrderResponse>> response = new GeneralResponse<>(
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    HttpStatus.NO_CONTENT.value(),
+                    HttpStatus.NO_CONTENT.getReasonPhrase(),
                     ex.getMessage(),
                     null
             );
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.NO_CONTENT)
                     .body(response);
         }
     }
@@ -147,8 +145,7 @@ public class PaymentController {
     @Operation(summary = "Eliminar orden no pagada", description = "Elimina una orden solo si está en estado PENDING")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Orden eliminada"),
-            @ApiResponse(responseCode = "404", description = "Orden no encontrada"),
-            @ApiResponse(responseCode = "409", description = "Orden ya pagada")
+            @ApiResponse(responseCode = "404", description = "Orden no encontrada")
     })
     public ResponseEntity<GeneralResponse<?>> deleteOrder(@PathVariable Long orderId) {
         try{

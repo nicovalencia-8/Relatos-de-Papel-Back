@@ -2,6 +2,7 @@ package com.relatos.ms_books_payments.externals;
 
 import com.relatos.ms_books_payments.externals.request.StockRequest;
 import com.relatos.ms_books_payments.externals.response.BookResponse;
+import com.relatos.ms_books_payments.externals.response.WrapperResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -21,11 +22,11 @@ public class CatalogueService {
         this.bookEndpoint = bookEndpoint;
     }
 
-    public BookResponse getBook(Long bookId) {
-        ResponseEntity<BookResponse> responseEntity =
+    public WrapperResponse getBook(Long bookId) {
+        ResponseEntity<WrapperResponse> responseEntity =
                 restTemplate.getForEntity(
                         String.format(bookEndpoint, bookId),
-                        BookResponse.class
+                        WrapperResponse.class
                 );
         return responseEntity.getBody();
 
@@ -39,7 +40,7 @@ public class CatalogueService {
                 String.format(bookEndpoint, bookId),
                 HttpMethod.PATCH,
                 requestEntity,
-                BookResponse.class
+                WrapperResponse.class
         );
     }
 

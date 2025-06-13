@@ -3,6 +3,7 @@ package com.relatos.ms_books_catalogue.services;
 import com.relatos.ms_books_catalogue.controllers.request.CreateBookRequest;
 import com.relatos.ms_books_catalogue.controllers.request.UpdateBookRequest;
 import com.relatos.ms_books_catalogue.controllers.response.BookResponse;
+import com.relatos.ms_books_catalogue.controllers.response.commons.GeneralResponse;
 import com.relatos.ms_books_catalogue.controllers.response.commons.PageResponse;
 import com.relatos.ms_books_catalogue.domains.Author;
 import com.relatos.ms_books_catalogue.domains.Book;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,7 +36,8 @@ public class BookService {
     private final BookRepository bookRepository;
     private final ImageRepository imageRepository;
 
-    public BookResponse createBook(CreateBookRequest bookRequest) {
+    @Transactional
+    public GeneralResponse<BookResponse> createBook(CreateBookRequest bookRequest) {
         Book book = bookRepository.findByISBN(bookRequest.getISBN());
         if (book == null) {
 
@@ -46,22 +49,32 @@ public class BookService {
             image = imageRepository.save(image);
             book = new Book(bookRequest, image, author, categories);
             book = bookRepository.save(book);
-            return new BookResponse(book);
+            return new GeneralResponse<>(
+                    HttpStatus.OK.value(),
+                    HttpStatus.OK.getReasonPhrase(),
+                    "Libro creado",
+                    new BookResponse(book)
+            );
         } else {
             throw new IllegalArgumentException("El libro ya se encuentra registrado");
         }
     }
 
-    public BookResponse getBookById(@Param("id") Long id) {
+    public GeneralResponse<BookResponse> getBookById(@Param("id") Long id) {
         Book book = bookRepository.findByIdC(id);
         if (book != null){
-            return new BookResponse(book);
+            return new GeneralResponse<>(
+                    HttpStatus.OK.value(),
+                    HttpStatus.OK.getReasonPhrase(),
+                    "Libro creado",
+                    new BookResponse(book)
+            );
         } else {
             throw new IllegalArgumentException("Libro no encontrado");
         }
     }
 
-    public PageResponse<BookResponse> getAllBooksByFilter(String title,
+    public GeneralResponse<PageResponse<BookResponse>> getAllBooksByFilter(String title,
                                                           Long authorId,
                                                           LocalDateTime publishedDate,
                                                           Long categoryId,
@@ -72,11 +85,16 @@ public class BookService {
                                                           int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Book> pageBook = bookRepository.findAllByFilters(pageRequest, title, authorId, publishedDate, categoryId, isbn, rating, visibility);
-        return new PageResponse<>(pageBook.map(BookResponse::new));
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Resultado del libro",
+                new PageResponse<>(pageBook.map(BookResponse::new))
+        );
     }
 
     @Transactional
-    public BookResponse updateBookById(@Param("id") Long bookId, CreateBookRequest bookRequest) {
+    public GeneralResponse<BookResponse> updateBookById(@Param("id") Long bookId, CreateBookRequest bookRequest) {
         Book book = bookRepository.findByIdC(bookId);
         if (book == null){
             throw new IllegalArgumentException("Libro no encontrado");
@@ -99,11 +117,17 @@ public class BookService {
         book.setCategories(categories);
         book.setVisibility(bookRequest.getVisibility());
         book = bookRepository.save(book);
-        return new BookResponse(book);
+
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Libro actualizado correctamente",
+                new BookResponse(book)
+        );
     }
 
     @Transactional
-    public BookResponse updateBookById(@Param("id") Long bookId, UpdateBookRequest bookRequest) {
+    public GeneralResponse<BookResponse> updateBookById(@Param("id") Long bookId, UpdateBookRequest bookRequest) {
         Book book = bookRepository.findByIdC(bookId);
         if (book == null){
             throw new IllegalArgumentException("Libro no encontrado");
@@ -141,13 +165,28 @@ public class BookService {
         if(bookRequest.getRating() != null) book.setRating(bookRequest.getRating());
         if(bookRequest.getVisibility() != null) book.setVisibility(bookRequest.getVisibility());
         book = bookRepository.save(book);
-        return new BookResponse(book);
+
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Libro actualizado correctamente",
+                new BookResponse(book)
+        );
     }
 
-    public void deleteBook(Long bookId) {
+    @Transactional
+    public GeneralResponse<?> deleteBook(Long bookId) {
         Book book = bookRepository.findByIdC(bookId);
         if (book != null){
             bookRepository.softDelete(bookId);
+
+            return new GeneralResponse<>(
+                    HttpStatus.NO_CONTENT.value(),
+                    HttpStatus.NO_CONTENT.getReasonPhrase(),
+                    "Libro eliminado correctamente",
+                    null
+            );
+
         } else {
             throw new IllegalArgumentException("Libro no encontrado");
         }

@@ -11,6 +11,7 @@ import com.relatos.ms_books_payments.domains.OrderStatusEnum;
 import com.relatos.ms_books_payments.externals.CatalogueService;
 import com.relatos.ms_books_payments.externals.request.StockRequest;
 import com.relatos.ms_books_payments.externals.response.BookResponse;
+import com.relatos.ms_books_payments.externals.response.WrapperResponse;
 import com.relatos.ms_books_payments.repositories.OrderItemRepository;
 import com.relatos.ms_books_payments.repositories.OrderRepository;
 import com.relatos.ms_books_payments.repositories.OrderStatusRepository;
@@ -196,11 +197,11 @@ public class PaymentService {
 
     private BookResponse getBookStock(OrderItemRequest item) {
         try {
-            BookResponse book = catalogueService.getBook(item.getBookId());
-            if (book.getStock() < item.getQuantity()) {
-                throw new IllegalArgumentException(String.format("No hay suficiente stock para el libro %s", book.getTitle()));
+            WrapperResponse response = catalogueService.getBook(item.getBookId());
+            if (response.getBody().getStock() < item.getQuantity()) {
+                throw new IllegalArgumentException(String.format("No hay suficiente stock para el libro %s", response.getBody().getTitle()));
             }
-            return book;
+            return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new IllegalArgumentException(String.format("El libro %d no existe", item.getBookId()));
         }
