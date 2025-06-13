@@ -9,7 +9,8 @@ import com.relatos.ms_books_payments.domains.OrderItem;
 import com.relatos.ms_books_payments.domains.OrderStatus;
 import com.relatos.ms_books_payments.domains.OrderStatusEnum;
 import com.relatos.ms_books_payments.externals.CatalogueService;
-import com.relatos.ms_books_payments.externals.responses.BookResponse;
+import com.relatos.ms_books_payments.externals.request.StockRequest;
+import com.relatos.ms_books_payments.externals.response.BookResponse;
 import com.relatos.ms_books_payments.repositories.OrderItemRepository;
 import com.relatos.ms_books_payments.repositories.OrderRepository;
 import com.relatos.ms_books_payments.repositories.OrderStatusRepository;
@@ -38,28 +39,18 @@ public class PaymentService {
         if (orderStatus == null) {
             orderStatus = orderStatusRepository.save(new OrderStatus(OrderStatusEnum.PENDING.name()));
         }
-        orderRequest.getItems().forEach(item -> {
-            try {
-                BookResponse book = catalogueService.getBook(item.getBookId());
-                if (book.getStock() < item.getQuantity()) {
-                    throw new IllegalArgumentException(String.format("No hay suficiente stock para el libro %s", book.getTitle()));
-                }
-            }catch(HttpClientErrorException e){
-                throw new IllegalArgumentException(String.format("El libro %d no existe", item.getBookId()));
-            }
-        });
+        orderRequest.getItems().forEach(this::getBookStock);
         Order order = new Order(orderRequest.getUserId(), orderStatus);
         Order orderSaved = orderRepository.save(order);
         List<OrderItem> orderItems = orderRequest.getItems().stream()
                 .map(itemRequest -> mapToOrderItem(itemRequest, orderSaved))
                 .toList();
         List<OrderItem> orderItemsSaved = orderItemRepository.saveAll(orderItems);
-        OrderResponse orderResponse = new OrderResponse(order, orderItemsSaved);
         return new GeneralResponse<>(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
                 "Orden creada exitosamente",
-                orderResponse
+                new OrderResponse(order, orderItemsSaved)
         );
     }
 
@@ -71,7 +62,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public OrderResponse addItemToOrder(Long orderId, OrderItemRequest request) {
+    public GeneralResponse<OrderResponse> addItemToOrder(Long orderId, OrderItemRequest request) {
         Order order = orderRepository.findByIdC(orderId);
         if (order == null) {
             throw new IllegalArgumentException("Orden no encontrada");
@@ -82,22 +73,37 @@ public class PaymentService {
         }
         OrderItem orderItem = orderItemRepository.findOrderItemByOrderAndBookId(order, request.getBookId());
         if (orderItem == null) {
+            getBookStock(request);
             orderItemRepository.save(new OrderItem(request, order));
             List<OrderItem> items = orderItemRepository.findOrderItemByOrder(order);
-            return new OrderResponse(order, items);
+            return new GeneralResponse<>(
+                    HttpStatus.OK.value(),
+                    HttpStatus.OK.getReasonPhrase(),
+                    "Ítem añadido exitosamente",
+                    new OrderResponse(order, items)
+            );
         }
 
         orderItem.setQuantity(orderItem.getQuantity() + request.getQuantity());
         orderItem.setPrice(orderItem.getPrice() + request.getPrice());
+        request.setQuantity(orderItem.getQuantity());
+        getBookStock(request);
         orderItemRepository.save(orderItem);
         List<OrderItem> items = orderItemRepository.findOrderItemByOrder(order);
-        return new OrderResponse(order, items);
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Ítem añadido exitosamente",
+                new OrderResponse(order, items)
+        );
     }
 
     // 3. Pagar orden
     @Transactional
-    public OrderResponse payOrder(Long orderId) {
+    public GeneralResponse<OrderResponse> payOrder(Long orderId) {
         Order order = orderRepository.findByIdC(orderId);
+        List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(order);
+
         if (order == null) {
             throw new IllegalArgumentException("Orden no encontrada");
         }
@@ -109,16 +115,26 @@ public class PaymentService {
         if (order.getStatus().equals(orderStatus)) {
             throw new IllegalArgumentException("La orden ya está pagada");
         }
+        orderItems.forEach(orderItem -> {
+            BookResponse book = getBookStock(new OrderItemRequest(orderItem));
+            updateStock(new OrderItemRequest(orderItem), book.getStock()-orderItem.getQuantity());
+        });
         order.setStatus(orderStatus);
         order = orderRepository.save(order);
-        List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrder(order);
-        return new OrderResponse(order, orderItems);
+
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Orden pagada exitosamente",
+                new OrderResponse(order, orderItems)
+        );
+
     }
 
     // 4. Consultar órdenes por usuario
-    public List<OrderResponse> getOrdersByUser(Long userId) {
+    public GeneralResponse<List<OrderResponse>> getOrdersByUser(Long userId) {
         List<Order> orderUser = orderRepository.findByUserId(userId);
-        if(orderUser.isEmpty()) {
+        if (orderUser.isEmpty()) {
             throw new IllegalArgumentException("Sin ordenes asignadas al usuario");
         }
         List<OrderResponse> responseList = new ArrayList<>();
@@ -128,23 +144,33 @@ public class PaymentService {
             responseList.add(new OrderResponse(order, items));
         }
 
-        return responseList;
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Órdenes encontradas",
+                responseList
+        );
     }
 
     // 5. Consultar detalle de orden
-    public OrderResponse getOrderById(Long orderId) {
+    public GeneralResponse<OrderResponse> getOrderById(Long orderId) {
         Order order = orderRepository.findByIdC(orderId);
         if (order == null) {
             throw new IllegalArgumentException("Orden no encontrada");
         }
         List<OrderItem> items = orderItemRepository.findOrderItemByOrder(order);
 
-        return new OrderResponse(order, items);
+        return new GeneralResponse<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Orden encontrada",
+                new OrderResponse(order, items)
+        );
     }
 
     // 6. Eliminar orden pendiente
     @Transactional
-    public void deleteOrder(Long orderId) {
+    public GeneralResponse<?> deleteOrder(Long orderId) {
         Order order = orderRepository.findByIdC(orderId);
         if (order == null) {
             throw new IllegalArgumentException("Orden no encontrada");
@@ -159,5 +185,34 @@ public class PaymentService {
         }
 
         orderRepository.softDelete(orderId);
+
+        return new GeneralResponse<>(
+                HttpStatus.NO_CONTENT.value(),
+                HttpStatus.NO_CONTENT.getReasonPhrase(),
+                "Orden eliminada",
+                null
+        );
     }
+
+    private BookResponse getBookStock(OrderItemRequest item) {
+        try {
+            BookResponse book = catalogueService.getBook(item.getBookId());
+            if (book.getStock() < item.getQuantity()) {
+                throw new IllegalArgumentException(String.format("No hay suficiente stock para el libro %s", book.getTitle()));
+            }
+            return book;
+        } catch (HttpClientErrorException e) {
+            throw new IllegalArgumentException(String.format("El libro %d no existe", item.getBookId()));
+        }
+    }
+
+    private void updateStock(OrderItemRequest item, Integer quantity) {
+        try {
+            StockRequest stock = new StockRequest(quantity);
+            catalogueService.updateStock(item.getBookId(), stock);
+        } catch(HttpClientErrorException e) {
+            throw new IllegalArgumentException(String.format("El libro %d no existe", item.getBookId()));
+        }
+    }
+
 }

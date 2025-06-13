@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments/orders")
@@ -58,13 +58,21 @@ public class PaymentController {
             @ApiResponse(responseCode = "404", description = "Orden o libro no encontrado"),
             @ApiResponse(responseCode = "409", description = "Conflicto de estado o ítem duplicado")
     })
-    public ResponseEntity<?> addItemToOrder(
+    public ResponseEntity<GeneralResponse<OrderResponse>> addItemToOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderItemRequest request) {
         try {
             return ResponseEntity.ok(paymentService.addItemToOrder(orderId, request));
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            GeneralResponse<OrderResponse> response = new GeneralResponse<>(
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    ex.getMessage(),
+                    null
+            );
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
         }
     }
 
@@ -75,11 +83,19 @@ public class PaymentController {
             @ApiResponse(responseCode = "404", description = "Orden o libro no encontrado"),
             @ApiResponse(responseCode = "409", description = "Orden ya pagada o sin stock")
     })
-    public ResponseEntity<?> payOrder(@PathVariable Long orderId) {
+    public ResponseEntity<GeneralResponse<OrderResponse>> payOrder(@PathVariable Long orderId) {
         try{
             return ResponseEntity.ok(paymentService.payOrder(orderId));
         } catch (IllegalArgumentException ex){
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            GeneralResponse<OrderResponse> response = new GeneralResponse<>(
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    ex.getMessage(),
+                    null
+            );
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
         }
     }
 
@@ -89,11 +105,19 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "Órdenes encontradas"),
             @ApiResponse(responseCode = "204", description = "Sin órdenes registradas")
     })
-    public ResponseEntity<?> getOrdersByUser(@PathVariable Long userId) {
+    public ResponseEntity<GeneralResponse<List<OrderResponse>>> getOrdersByUser(@PathVariable Long userId) {
         try{
             return ResponseEntity.ok(paymentService.getOrdersByUser(userId));
         } catch (IllegalArgumentException ex){
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            GeneralResponse<List<OrderResponse>> response = new GeneralResponse<>(
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    ex.getMessage(),
+                    null
+            );
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
         }
     }
 
@@ -103,11 +127,19 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "Orden encontrada"),
             @ApiResponse(responseCode = "404", description = "Orden no encontrada")
     })
-    public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
+    public ResponseEntity<GeneralResponse<OrderResponse>> getOrderById(@PathVariable Long orderId) {
         try{
             return ResponseEntity.ok(paymentService.getOrderById(orderId));
         } catch (IllegalArgumentException ex){
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            GeneralResponse<OrderResponse> response = new GeneralResponse<>(
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    ex.getMessage(),
+                    null
+            );
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
         }
     }
 
@@ -118,12 +150,21 @@ public class PaymentController {
             @ApiResponse(responseCode = "404", description = "Orden no encontrada"),
             @ApiResponse(responseCode = "409", description = "Orden ya pagada")
     })
-    public ResponseEntity<?> deleteOrder(@PathVariable Long orderId) {
+    public ResponseEntity<GeneralResponse<?>> deleteOrder(@PathVariable Long orderId) {
         try{
-            paymentService.deleteOrder(orderId);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(paymentService.deleteOrder(orderId));
         } catch (IllegalArgumentException ex){
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            GeneralResponse<?> response = new GeneralResponse<>(
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    ex.getMessage(),
+                    null
+            );
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
         }
     }
 

@@ -1,9 +1,10 @@
 package com.relatos.ms_books_payments.externals;
 
-import com.relatos.ms_books_payments.externals.responses.BookResponse;
+import com.relatos.ms_books_payments.externals.request.StockRequest;
+import com.relatos.ms_books_payments.externals.response.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,6 +29,18 @@ public class CatalogueService {
                 );
         return responseEntity.getBody();
 
+    }
+
+    public void updateStock(Long bookId, StockRequest stockRequest) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<StockRequest> requestEntity = new HttpEntity<>(stockRequest, headers);
+        restTemplate.exchange(
+                String.format(bookEndpoint, bookId),
+                HttpMethod.PATCH,
+                requestEntity,
+                BookResponse.class
+        );
     }
 
 }

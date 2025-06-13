@@ -1,4 +1,4 @@
-package com.relatos.ms_books_payments.externals.responses;
+package com.relatos.ms_books_payments.externals.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryResponse {
+public class AuthorResponse {
 
     private Long id;
-    private String categoryName;
+    private String firstName;
+    private String lastName;
 
 }

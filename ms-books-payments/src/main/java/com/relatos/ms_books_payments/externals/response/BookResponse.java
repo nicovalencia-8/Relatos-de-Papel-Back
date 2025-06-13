@@ -1,4 +1,4 @@
-package com.relatos.ms_books_payments.externals.responses;
+package com.relatos.ms_books_payments.externals.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
