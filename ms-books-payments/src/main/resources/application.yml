@@ -10,6 +10,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/paymentsdb
     username: payments
     password: R3l4t0SP4ym3ntS
+  jpa:
+    hibernate:
+      ddl-auto: update
 ## Configuración CLiente Eureka
 eureka:
   client:
@@ -18,3 +21,6 @@ eureka:
   instance:
     preferIpAddress: true
     hostname: ms-books-payments
+
+ms-catalogue:
+  url: http://ms-books-catalogue/api/v1/catalogue/books/%s

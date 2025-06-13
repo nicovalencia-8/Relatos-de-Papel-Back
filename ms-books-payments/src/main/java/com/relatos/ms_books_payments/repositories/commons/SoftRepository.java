@@ -1,4 +1,4 @@
-package com.relatos.ms_books_catalogue.repositories.commons;
+package com.relatos.ms_books_payments.repositories.commons;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,3 +27,4 @@ public interface SoftRepository<T> extends JpaRepository<T, Long> {
     void softDelete(@Param("id") Long id);
 
 }
+
