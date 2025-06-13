@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/payments/orders")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Pagos", description = "Controlador para administrar los pedidos y pagos")
